@@ -13,5 +13,17 @@ namespace TrainingCenterApp.Controllers
         {
             return Ok(DataContext.Rooms);
         }
+
+        
+        [HttpGet("{id}")]
+        public ActionResult<Room> GetRoomById(int id)
+        {
+            var room = DataContext.Rooms.FirstOrDefault(r => r.Id == id);
+            if (room == null)
+            {
+                return NotFound();
+            }
+            return Ok(room);
+        }
     }
 }
