@@ -52,6 +52,12 @@ namespace TrainingCenterApp.Controllers
         [HttpPost]
         public ActionResult<Room> AddRoom([FromBody] Room newRoom)
         {
+            if (string.IsNullOrWhiteSpace(newRoom.Name) ||
+                string.IsNullOrWhiteSpace(newRoom.BuildingCode) ||
+                newRoom.Capacity <= 0)
+            {
+                return BadRequest("Invalid input data.");
+            }
             int newId = DataContext.Rooms.Any() ? DataContext.Rooms.Max(r => r.Id) + 1 : 1;
             newRoom.Id = newId;
             DataContext.Rooms.Add(newRoom);
@@ -61,6 +67,12 @@ namespace TrainingCenterApp.Controllers
         [HttpPut("{id}")]
         public ActionResult<Room> UpdateRoom(int id, [FromBody] Room updatedRoom)
         {
+            if (string.IsNullOrWhiteSpace(updatedRoom.Name) ||
+                string.IsNullOrWhiteSpace(updatedRoom.BuildingCode) ||
+                updatedRoom.Capacity <= 0)
+            {
+                return BadRequest("Invalid input data.");
+            }
             var room = DataContext.Rooms.FirstOrDefault(r => r.Id == id);
             if (room == null)
             {
