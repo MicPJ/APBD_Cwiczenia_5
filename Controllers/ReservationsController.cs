@@ -42,6 +42,31 @@ namespace TrainingCenterApp.Controllers
             {
                 return BadRequest("EndTime must be later than StartTime.");
             }
+
+            var room = DataContext.Rooms.FirstOrDefault(r => r.Id == newReservation.RoomId);
+            if (room == null)
+            {
+                return BadRequest("Room does not exist.");
+            }
+            if (!room.IsActive)
+            {
+                return Conflict("Cannot reserve an inactive room.");
+            }
+
+            bool isConflict = DataContext.Reservations.Any(r =>
+                r.RoomId == newReservation.RoomId &&
+                r.Date == newReservation.Date &&
+                r.Id != newReservation.Id &&
+                r.Status != "cancelled" &&
+                (
+                    (newReservation.StartTime < r.EndTime && newReservation.EndTime > r.StartTime)
+                )
+            );
+            if (isConflict)
+            {
+                return Conflict("Time conflict with another reservation.");
+            }
+
             int newId = DataContext.Reservations.Any() ? DataContext.Reservations.Max(r => r.Id) + 1 : 1;
             newReservation.Id = newId;
             DataContext.Reservations.Add(newReservation);
